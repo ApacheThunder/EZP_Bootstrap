@@ -46,11 +46,15 @@ As with other flashcarts. Arm9 secure area must be encrypted (though this progra
 Game code used in header is hardcoded as well due to hardcoded blowfish keys so do not attempt to change that.
 
 Data at 0x1000 mostly pertain to the ntrboot payload this flashcart uses on 3DS.
-Though the data found at 0x1200 is a copy of data found at found at 0x108400
+Though the data found at 0x1200 is a copy of data found at found at 0x108400. (during normal rom reads)
 
-EZP for some reason mirrors this data from 0x1200 into 0x108400 when rom reads happen instead of presening any data orginally found there in the flash.
+EZP for some reason mirrors this data from 0x1200 into 0x108400 when rom reads happen instead of presenting any data orginally found there in the flash.
 
 This is easy to account for. Anytime you build a custom bin file for this cart, just copy a 0x400 chunk of data from 0x108400 over to 0x1200.
+
+It is possible data at 0x0x108400 instead appears else where in regions beyond the 4MB range of the flash chip.
+
+But it's beyond the real data range of the internal flash chip so really not relevent anymore if you are using a custom rom.
 
 I have not tested if the cart still functions correctly with the 3DS ntrboot stuff missing. I would recommend ensuring this is still present.
 
@@ -65,7 +69,7 @@ Doing so will make the recovery tool run a special command to reset the write pr
 However from my tests the cart won't mount/read the flash contents while it's in this state. So after doing the save intialize to trigger the reset of write protection,
 you must solder it back down. Then go back into EZP Recovery Tool and flash a new bin file. This should now properly write the intended data to the first couple of blocks.
 
-Do not run official fw 1.06 or newer on the cart again in the future. Doing so will require a repeat of this process if you want to flash a new custom rom to it agian.
+Do not run official fw v1.06 or newer on the cart again in the future. Doing so will require a repeat of this process if you want to flash a new custom rom to it agian.
 
 
 # License
