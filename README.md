@@ -26,6 +26,10 @@ Please refer to the fat image in NitroFS folder for that file if you wish to cus
 This menu has a special feature in the filebrowser. You will notice that on boot it will show the file listing for the files found inside internal FAT image
 stored in NitroFS. This is made possible with a special "NTRO" dldi driver that I wrote. This allows this cart to boot without a MicroSD card inserted!
 
+You can find my source to that driver here:
+
+https://github.com/ApacheThunder/DLDI/tree/master/source/ntro
+
 However some actions will of coarse require the presense of a MicroSD card. (some of the included apps depend on that)
 
 Assuming a MicroSD card is present on boot you can use shoulder buttons to navigate to MicroSD storage when wanting to boot files from MicroSD.
@@ -52,7 +56,8 @@ EZP for some reason mirrors this data from 0x1200 into 0x108400 when rom reads h
 
 This is easy to account for. Anytime you build a custom bin file for this cart, just copy a 0x400 chunk of data from 0x108400 over to 0x1200.
 
-It is possible data at 0x0x108400 instead appears else where in regions beyond the 4MB range of the flash chip.
+It is possible data at 0x108400 instead appears else where in regions beyond the 4MB range of the flash chip.
+(or it may have put it's exploit here and swaps it in after passing the white list checks)
 
 But it's beyond the real data range of the internal flash chip so really not relevent anymore if you are using a custom rom.
 
@@ -60,7 +65,7 @@ I have not tested if the cart still functions correctly with the 3DS ntrboot stu
 
 Fortunately though this cart can't really be bricked if you flash bad data to it. (I've ensured you can still use EZP Recovery Tool regardless of what state it's in).
 
-Do note though if you have run official firmware 1.06 or newer on this card, 0x0 to 0x7FFF is write protected.
+Do note though if you have run official firmware v1.06 or newer on this card, 0x0 to 0x7FFF is write protected.
 
 To undo this you must desolder WP# of eeprom flash chip. While it's lifted, run EZP_Recovery_Tool and perform a save initialize via the restore menu.
 
