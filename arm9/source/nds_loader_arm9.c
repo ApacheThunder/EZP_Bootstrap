@@ -54,7 +54,7 @@
 typedef signed int addr_t;
 typedef unsigned char data_t;
 
-extern bool usingInternalFat;
+extern volatile bool usingInternalFat;
 
 #define FIX_ALL		0x01
 #define FIX_GLUE	0x02

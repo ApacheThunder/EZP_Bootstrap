@@ -38,6 +38,7 @@
 #include "skin.h"
 #include "tonccpy.h"
 #include "nrio_detect.h"
+#include "ez5n.h"
 #include "nds_loader_arm9.h"
 
 #define BG_256_COLOR (BIT(7))
@@ -45,21 +46,26 @@
 
 using namespace std;
 
+volatile bool EZ5NFatInit = false;
+volatile bool usingInternalFat = true;
 volatile bool guiEnabled = false;
 volatile bool gbaGuiEnabled = false;
 
 // const bool BlankScreenOnBoot = true;
 
-static const int pathListSize = 3;
-static const int framePathListSize = 4;
+static const int pathListSize = 4;
+static const int framePathListSize = 5;
 
-static const char *PossiblePaths[3] = { "GBAExploader.nds", "/boot.nds", "/boot.dat" };
+// First path is expected to be from internal fat image.
+static const char *PossiblePaths[4] = { "/GBAExploader.nds", "ez5n:/boot.nds", "ez5n:/boot.dat", "ez5n:/GBAExploader.nds" };
 
-static const char *GBAFramePaths[4] = {
+// First path is expected to be from internal fat image.
+static const char *GBAFramePaths[5] = {
 	"/gbaframe.bmp",
-	"/GBA_SIGN/gbaframe.bmp",
-	"/_system_/gbaframe.bmp",
-	"/ttmenu/gbaframe.bmp"
+	"ez5n:/gbaframe.bmp",
+	"ez5n:/GBA_SIGN/gbaframe.bmp",
+	"ez5n:/_system_/gbaframe.bmp",
+	"ez5n:/ttmenu/gbaframe.bmp"
 };
 
 void InitGUI(void) {
@@ -131,6 +137,10 @@ void SetKernelRomPage() {
 void LoadGBAFrame() {
 	InitGUIForGBA();
 	for (int i = 0; i < framePathListSize; i++) {
+		if ((i > 0)) {
+			if (!EZ5NFatInit)EZ5NFatInit = fatMountSimple("ez5n", &io_ez5n);
+			if (!EZ5NFatInit)return;
+		}
 		if ((access(GBAFramePaths[i], F_OK) == 0) && LoadSkin(3, GBAFramePaths[i]))return;
 	}
 }
@@ -202,47 +212,45 @@ int main(int argc, char **argv) {
 	// so tapping power on DSi returns to DSi menu
 	extern u64 *fake_heap_end;
 	*fake_heap_end = 0;
-	bool fatInit = fatInitDefault();
-	// if (!fatMountSimple("ez5n", &io_ez5n)) {
-	if (!fatInit) {
+	if (!fatInitDefault()) {
 		InitGUI();
 		consoleClear();
-		printf ("\n\n\n\n\n\n\n\n\n\n       FAT init failed!       \n");
+		printf ("\n\n\n\n\n\n\n\n\n\n       NTRO INIT FAILED!\n");
 		return stop();
 	}
 	swiWaitForVBlank();
 	scanKeys();
 	u32 key = keysDown();
+	bool autoBoot = false;
 	switch (key) {
-		case KEY_A: {
-			for (int i = 0; i < pathListSize; i++) {
-				if (access(PossiblePaths[i], F_OK) == 0) {
-					runNdsFile(PossiblePaths[i], 0, NULL);
-					return stop();
-				}
-			}
-			FileBrowser();
-		} break;
 		case KEY_B: gbaMode(); break;
 		case KEY_X: {
-			if((access("/mmd.nds", F_OK) == 0)) {
-				runNdsFile("/mmd.nds", 0, NULL);
-			} else {
-				FileBrowser();
-			}
+			if((access("/mmd.nds", F_OK) == 0))runNdsFile("/mmd.nds", 0, NULL);
 		} break;
 		case KEY_Y: {
-			if((access("/GodMode9i.nds", F_OK) == 0)) { runNdsFile("/GodMode9i.nds", 0, NULL); } else { FileBrowser(); }
+			if((access("/GodMode9i.nds", F_OK) == 0))runNdsFile("/GodMode9i.nds", 0, NULL);
 		} break;
-		// case 0: gbaMode(); break;
-		default: {
-			if (!(key & KEY_SELECT) && (access("/nrio-usb-disk.nds", F_OK) == 0)) {
+		case KEY_SELECT: autoBoot = true; break;
+		case 0: {
+			autoBoot = true;
+			if (access("/nrio-usb-disk.nds", F_OK) == 0) {
 				nrio_usb_type_t usb = nrio_usb_detect();
-				if (usb.board_type != 0)runNdsFile("/nrio-usb-disk.nds", 0, NULL); 
+				if (usb.board_type != 0)runNdsFile("/nrio-usb-disk.nds", 0, NULL);
 			}
-			FileBrowser();
 		} break;
 	}
+	if (autoBoot) {
+		for (int i = 0; i < pathListSize; i++) {
+			if ((i > 0) && !EZ5NFatInit) {
+				EZ5NFatInit = fatMountSimple("ez5n", &io_ez5n);
+				if(!EZ5NFatInit)break;
+				usingInternalFat = false;
+			}
+			if (access(PossiblePaths[i], F_OK) == 0)runNdsFile(PossiblePaths[i], 0, NULL);
+		}
+	}
+	if (!usingInternalFat)usingInternalFat = true;
+	FileBrowser();
 	return stop();
 }
 

@@ -42,9 +42,8 @@
 using namespace std;
 
 extern void gbaMode();
-
-bool EZ5NFatInit = false;
-bool usingInternalFat = true;
+extern volatile bool EZ5NFatInit;
+extern volatile bool usingInternalFat;
 
 struct DirEntry {
 	string name;
