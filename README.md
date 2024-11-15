@@ -5,11 +5,12 @@ This can not be used on other carts and is targed specifically for this cart and
 
 The program will change boot behavior based on what button is held on boot:
 
-* Holding no button on boot will show file browser.
-* Holding A button will auto boot into GBA-Exploader. Specifically a new custom version with SuperCard and EZFlash Omega support.
+* Holding no button on boot autoboot into GBA-Exploader. Specifically a new custom version with SuperCard and EZFlash Omega support.
+  - Note that if GBA Exploader is removed from internal fat image (or filename is renamed), boot.nds will be autobooted from MicroSD instead.
 * Holding B button will reboot console into GBA mode with gbaframe.bmp as the frame graphic.
 * Holding Y button will boot GodMode9i.
 * Holding X button will boot MaxMediaDock's slot1 rom for booting into MaxMediaDock devices on slot-2.
+* Holding any other button will boot into filebrowser skipping autoboot. Except for Select button which is only used to skip nrio-usb-disk autoboot if USB slot2 card is present.
 
 Also if an N-Card or N-Card clone USB slot-2 device is present on boot, the program will auto boot into nrio-usb-disk. A open source
 file transfer program that makes use of the USB slot-2 device to connect flashcart's MicroSD storage to PC.
