@@ -55,6 +55,7 @@ volatile bool gbaGuiEnabled = false;
 
 static const int pathListSize = 4;
 static const int framePathListSize = 5;
+static const bool EnableAutoBoot = false;
 
 // First path is expected to be from internal fat image.
 static const char *PossiblePaths[4] = { "/GBAExploader.nds", "ez5n:/boot.nds", "ez5n:/boot.dat", "ez5n:/GBAExploader.nds" };
@@ -224,15 +225,15 @@ int main(int argc, char **argv) {
 	bool autoBoot = false;
 	switch (key) {
 		case KEY_B: gbaMode(); break;
+		case KEY_A: {
+			if((access("/GodMode9i.nds", F_OK) == 0))runNdsFile("/GodMode9i.nds", 0, NULL);
+		} break;
 		case KEY_X: {
 			if((access("/mmd.nds", F_OK) == 0))runNdsFile("/mmd.nds", 0, NULL);
 		} break;
-		case KEY_Y: {
-			if((access("/GodMode9i.nds", F_OK) == 0))runNdsFile("/GodMode9i.nds", 0, NULL);
-		} break;
-		case KEY_SELECT: autoBoot = true; break;
+		case KEY_SELECT: autoBoot = EnableAutoBoot; break;
 		case 0: {
-			autoBoot = true;
+			autoBoot = EnableAutoBoot;
 			if (access("/nrio-usb-disk.nds", F_OK) == 0) {
 				nrio_usb_type_t usb = nrio_usb_detect();
 				if (usb.board_type != 0)runNdsFile("/nrio-usb-disk.nds", 0, NULL);

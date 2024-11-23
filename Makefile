@@ -5,15 +5,14 @@ ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
 endif
 
-export TARGET := EZDS_P
+export TARGET := EZFLASH_NEW
 export TOPDIR := $(CURDIR)
 
-export HBMENU_MAJOR	:= 1
-export HBMENU_MINOR	:= 0
-export HBMENU_PATCH	:= 2
+# export HBMENU_MAJOR	:= 1
+# export HBMENU_MINOR	:= 3
 
 
-VERSION	:=	$(HBMENU_MAJOR).$(HBMENU_MINOR).$(HBMENU_PATCH)
+# VERSION	:=	$(HBMENU_MAJOR).$(HBMENU_MINOR)
 
 # GMAE_ICON is the image used to create the game icon, leave blank to use default rule
 GAME_ICON :=
@@ -47,7 +46,6 @@ checkarm9:
 #---------------------------------------------------------------------------------
 $(TARGET).nds : $(NITRO_FILES) arm7/$(TARGET).elf arm9/$(TARGET).elf
 	ndstool	-c $(TARGET).nds -7 arm7/$(TARGET).elf -9 arm9/$(TARGET).elf \
-			-b $(CURDIR)/icon.bmp "hbmenu;$(VERSION);http://devkitpro.org" \
 			-g ABJJ 01 "EZFLASH NEW" -t banner.bin -d $(NITRO_FILES)
 	dlditool ntro.dldi $(TARGET).nds
 

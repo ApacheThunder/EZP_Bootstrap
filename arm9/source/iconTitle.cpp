@@ -30,17 +30,26 @@
 #include "hbmenu_banner.h"
 #include "font6x8.h"
 
-#define TITLE_POS_X	(13*8)
-#define TITLE_POS_Y	(10*8)
+#define TITLE_POS_X			(13*8)
+#define TITLE_POS_Y			(2)
+#define TITLE_POS_OFFSET_Y	(10)
 
 #define ICON_POS_X	26
-#define ICON_POS_Y	79
+// #define ICON_POS_Y	79
+#define ICON_POS_Y	81
 
-#define TEXT_WIDTH	((22-4)*8/6)
+#define TEXT_WIDTH				((22-4)*8/6)
+#define TEXT_WIDTH_VERSTRING	((26-4)*8/6)
+
+#define VERSTRING_LENGTH 26
 
 static int bg2, bg3;
 static u16 *sprite;
 static tNDSBanner banner;
+
+static volatile u32 EZPHWVerBuffer[1] = { 0xFFFFFFFF };
+// static char EZPHardwareVersion[11] = { 'H', 'W', ' ', 'V', 'e', 'r', ':', ' ', '0', '0', '\0' };
+static char EZPHardwareVersion[VERSTRING_LENGTH];
 
 extern tNDSBanner hbNoIcon_bin;
 
@@ -59,24 +68,37 @@ static inline void writecharRS (int row, int col, u16 car) {
 	gfx[row*(512/8/2)+col/2] = oldval;
 }
 
+// Modified to use TITLE_POS_OFFSET_Y as offset since ver string needs to be printed at 0 position outside of main text box.
 static inline void writeRow (int rownum, const char* text) {
+	int i, len, r = (rownum + TITLE_POS_OFFSET_Y), p = 0;
+	len=strlen(text);
+
+	if (len>TEXT_WIDTH)len=TEXT_WIDTH;
+
+	// clear left part
+	for (i=0;i<(TEXT_WIDTH-len)/2;i++)writecharRS (r, i, 0);
+
+	// write centered text
+	for (i=(TEXT_WIDTH-len)/2;i<((TEXT_WIDTH-len)/2+len);i++)writecharRS (r, i, text[p++]-' ');
+
+	// clear right part
+	for (i=((TEXT_WIDTH-len)/2+len);i<TEXT_WIDTH;i++)writecharRS (r, i, 0);
+}
+
+static inline void writeVerString (const char* text) {
 	int i,len,p=0;
 	len=strlen(text);
 
-	if (len>TEXT_WIDTH)
-		len=TEXT_WIDTH;
+	if (len>TEXT_WIDTH_VERSTRING)len=TEXT_WIDTH_VERSTRING;
 
 	// clear left part
-	for (i=0;i<(TEXT_WIDTH-len)/2;i++)
-		writecharRS (rownum, i, 0);
+	for (i=0;i<(TEXT_WIDTH_VERSTRING-len)/2;i++)writecharRS (0, i, 0);
 
 	// write centered text
-	for (i=(TEXT_WIDTH-len)/2;i<((TEXT_WIDTH-len)/2+len);i++)
-		writecharRS (rownum, i, text[p++]-' ');
+	for (i=(TEXT_WIDTH_VERSTRING-len)/2;i<((TEXT_WIDTH_VERSTRING-len)/2+len);i++)writecharRS (0, i, text[p++]-' ');
 
 	// clear right part
-	for (i=((TEXT_WIDTH-len)/2+len);i<TEXT_WIDTH;i++)
-		writecharRS (rownum, i, 0);
+	for (i=((TEXT_WIDTH_VERSTRING-len)/2+len);i<TEXT_WIDTH_VERSTRING;i++)writecharRS (0, i, 0);
 }
 
 static inline void clearIcon (void) { dmaFillHalfWords(0, sprite, sizeof(banner.icon)); }
@@ -143,6 +165,16 @@ static void loadDefaultIcon() {
 
 
 void iconTitleUpdate (int isdir, const std::string& name) {
+	
+	if (EZPHWVerBuffer[0] == 0xFFFFFFFF) {
+		cardParamCommand (0x3E, 0, CARD_ACTIVATE | CARD_nRESET | CARD_BLK_SIZE(7) | CARD_SEC_CMD | CARD_DELAY2(24) | CARD_SEC_EN | CARD_SEC_DAT, (u32*)EZPHWVerBuffer, 1);
+		if (EZPHWVerBuffer[0] != 0xFFFFFFFF) {
+			for (int i = 0; i < VERSTRING_LENGTH; i++)EZPHardwareVersion[i] = '\0';
+			sprintf(EZPHardwareVersion, "          EZP HW VER   %02X", (u8)EZPHWVerBuffer[0]);
+			writeVerString(EZPHardwareVersion);
+		}
+	}
+	
 	writeRow (0, name.c_str());
 	writeRow (1, "");
 	writeRow (2, "");
