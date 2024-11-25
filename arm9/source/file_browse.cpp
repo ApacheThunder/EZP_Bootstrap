@@ -73,7 +73,7 @@ void getDirectoryContents (vector<DirEntry>& dirContents, const vector<string> e
 	struct stat st;
 
 	dirContents.clear();
-
+	
 	DIR *pdir = opendir (".");
 
 	if (pdir == NULL) {
@@ -89,9 +89,7 @@ void getDirectoryContents (vector<DirEntry>& dirContents, const vector<string> e
 			dirEntry.name = pent->d_name;
 			dirEntry.isDirectory = (st.st_mode & S_IFDIR) ? true : false;
 
-			if (dirEntry.name.compare(".") != 0 && (dirEntry.isDirectory || nameEndsWith(dirEntry.name, extensionList))) {
-				dirContents.push_back (dirEntry);
-			}
+			if (dirEntry.name.compare(".") != 0 && (dirEntry.isDirectory || nameEndsWith(dirEntry.name, extensionList)))dirContents.push_back (dirEntry);
 		}
 		closedir(pdir);
 	}
@@ -113,11 +111,7 @@ void showDirectoryContents (const vector<DirEntry>& dirContents, int startRow) {
 	consoleClear();
 	
 	// Print the path
-	if (strlen(path) < SCREEN_COLS) {
-		iprintf ("%s", path);
-	} else {
-		iprintf ("%s", path + strlen(path) - SCREEN_COLS);
-	}
+	if (strlen(path) < SCREEN_COLS) { iprintf ("%s", path); } else { iprintf ("%s", path + strlen(path) - SCREEN_COLS);	}
 
 	// Move to 2nd row
 	iprintf ("\x1b[1;0H");
@@ -157,11 +151,9 @@ string browseForFile (const vector<string>& extensionList) {
 
 	while (true) {
 		// Clear old cursors
-		for (int i = ENTRIES_START_ROW; i < ENTRIES_PER_SCREEN + ENTRIES_START_ROW; i++) {
-			iprintf ("\x1b[%d;0H ", i);
-		}
+		for (int i = ENTRIES_START_ROW; i < ENTRIES_PER_SCREEN + ENTRIES_START_ROW; i++)iprintf ("\x1b[%d;0H ", i);
 		// Show cursor
-		iprintf ("\x1b[%d;0H*", fileOffset - screenOffset + ENTRIES_START_ROW);
+		iprintf ("\x1b[%d;0H>", fileOffset - screenOffset + ENTRIES_START_ROW);
 
 		iconTitleUpdate (dirContents.at(fileOffset).isDirectory, dirContents.at(fileOffset).name);
 
@@ -185,7 +177,7 @@ string browseForFile (const vector<string>& extensionList) {
 				}
 			} else {
 				usingInternalFat = true;
-				if (access("fat:/", F_OK) == 0)chdir("fat:/");
+				if (access("nitro:/", F_OK) == 0)chdir("nitro:/");
 				pressed = 0;
 				screenOffset = 0;
 				fileOffset = 0;

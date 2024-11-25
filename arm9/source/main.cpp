@@ -58,11 +58,11 @@ static const int framePathListSize = 5;
 static const bool EnableAutoBoot = true;
 
 // First path is expected to be from internal fat image.
-static const char *PossiblePaths[4] = { "/GBAExploader.nds", "ez5n:/boot.nds", "ez5n:/boot.dat", "ez5n:/GBAExploader.nds" };
+static const char *PossiblePaths[4] = { "nitro:/GBAExploader.nds", "ez5n:/boot.nds", "ez5n:/boot.dat", "ez5n:/GBAExploader.nds" };
 
 // First path is expected to be from internal fat image.
 static const char *GBAFramePaths[5] = {
-	"/gbaframe.bmp",
+	"nitro:/gbaframe.bmp",
 	"ez5n:/gbaframe.bmp",
 	"ez5n:/GBA_SIGN/gbaframe.bmp",
 	"ez5n:/_system_/gbaframe.bmp",
@@ -165,15 +165,19 @@ void gbaMode() {
 } 
 
 int stop(void) {
+	u32 pressed = 0;
 	while(1) {
 		swiWaitForVBlank();
 		scanKeys();
-		if (!keysHeld())break;
+		pressed = keysHeld();
+		if (pressed == 0)break;
 	}
-	while (1) {
+	swiWaitForVBlank();
+	while(1) {
 		swiWaitForVBlank();
 		scanKeys();
-		if (keysDown() != 0)break;
+		pressed = keysHeld();
+		if (pressed > 0)break;
 	}
 	return 0;
 }
@@ -187,7 +191,8 @@ int FileBrowser() {
 		if (!keysHeld())break;
 	}
 	vector<string> extensionList = argsGetExtensionList();
-	// if (access("fat:/nds", F_OK) == 0)chdir("fat:/nds");
+	// if (access("fat:/nds", F_OK) == 0)chdir("nitro:/nds");
+	if (access("nitro:/", F_OK) == 0)chdir("nitro:/");
 	while(1) {
 		string filename = browseForFile(extensionList);
 		// Construct a command line
@@ -213,10 +218,11 @@ int main(int argc, char **argv) {
 	// so tapping power on DSi returns to DSi menu
 	extern u64 *fake_heap_end;
 	*fake_heap_end = 0;
-	if (!fatInitDefault()) {
+	//if (!fatInitDefault()) {
+	if (!fatMountSimple("nitro", dldiGetInternal())) {
 		InitGUI();
 		consoleClear();
-		printf ("\n\n\n\n\n\n\n\n\n\n       NTRO INIT FAILED!\n");
+		printf ("\n\n\n\n\n\n\n\n\n\n       NITRO INIT FAILED!\n");
 		return stop();
 	}
 	swiWaitForVBlank();
@@ -226,17 +232,17 @@ int main(int argc, char **argv) {
 	switch (key) {
 		case KEY_B: gbaMode(); break;
 		case KEY_A: {
-			if((access("/GodMode9i.nds", F_OK) == 0))runNdsFile("/GodMode9i.nds", 0, NULL);
+			if((access("nitro:/GodMode9i.nds", F_OK) == 0))runNdsFile("nitro:/GodMode9i.nds", 0, NULL);
 		} break;
 		case KEY_X: {
-			if((access("/mmd.nds", F_OK) == 0))runNdsFile("/mmd.nds", 0, NULL);
+			if((access("nitro:/mmd.nds", F_OK) == 0))runNdsFile("nitro:/mmd.nds", 0, NULL);
 		} break;
 		case KEY_SELECT: autoBoot = EnableAutoBoot; break;
 		case 0: {
 			autoBoot = EnableAutoBoot;
-			if (access("/nrio-usb-disk.nds", F_OK) == 0) {
+			if (access("nitro:/nrio-usb-disk.nds", F_OK) == 0) {
 				nrio_usb_type_t usb = nrio_usb_detect();
-				if (usb.board_type != 0)runNdsFile("/nrio-usb-disk.nds", 0, NULL);
+				if (usb.board_type != 0)runNdsFile("nitro:/nrio-usb-disk.nds", 0, NULL);
 			}
 		} break;
 	}

@@ -149,7 +149,7 @@ static bool dldiPatchLoader (data_t *binData, u32 binSize, bool clearBSS, bool u
 	if (patchOffset < 0)return false; // does not have a DLDI section
 
 	if (useEZPDLDI) {
-		EZ5NDLDI = dldiLoadFromFile("fat:/ez5n.dldi");
+		EZ5NDLDI = dldiLoadFromFile("nitro:/ez5n.dldi");
 		pDH = (data_t*)(EZ5NDLDI);
 	} else {
 		pDH = (data_t*)(io_dldi_data);
