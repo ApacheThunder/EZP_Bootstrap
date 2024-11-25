@@ -47,9 +47,9 @@ static int bg2, bg3;
 static u16 *sprite;
 static tNDSBanner banner;
 
-static volatile u32 EZPHWVerBuffer[1] = { 0xFFFFFFFF };
 // static char EZPHardwareVersion[11] = { 'H', 'W', ' ', 'V', 'e', 'r', ':', ' ', '0', '0', '\0' };
 static char EZPHardwareVersion[VERSTRING_LENGTH];
+static u32 EZPHWVerBuffer[1] = { 0xFFFFFFFF };
 
 extern tNDSBanner hbNoIcon_bin;
 

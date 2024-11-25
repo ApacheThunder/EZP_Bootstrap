@@ -38,8 +38,8 @@
 #include "skin.h"
 #include "tonccpy.h"
 #include "nrio_detect.h"
-#include "ez5n.h"
 #include "nds_loader_arm9.h"
+#include "ez5n.h"
 
 #define BG_256_COLOR (BIT(7))
 #define FlashBase_S98	0x09000000
@@ -55,7 +55,7 @@ volatile bool gbaGuiEnabled = false;
 
 static const int pathListSize = 4;
 static const int framePathListSize = 5;
-static const bool EnableAutoBoot = false;
+static const bool EnableAutoBoot = true;
 
 // First path is expected to be from internal fat image.
 static const char *PossiblePaths[4] = { "/GBAExploader.nds", "ez5n:/boot.nds", "ez5n:/boot.dat", "ez5n:/GBAExploader.nds" };
@@ -243,8 +243,8 @@ int main(int argc, char **argv) {
 	if (autoBoot) {
 		for (int i = 0; i < pathListSize; i++) {
 			if ((i > 0) && !EZ5NFatInit) {
-				EZ5NFatInit = fatMountSimple("ez5n", &io_ez5n);
-				if(!EZ5NFatInit)break;
+				if (!EZ5NFatInit)EZ5NFatInit = fatMountSimple("ez5n", &io_ez5n);
+				if (!EZ5NFatInit)break;
 				usingInternalFat = false;
 			}
 			if (access(PossiblePaths[i], F_OK) == 0)runNdsFile(PossiblePaths[i], 0, NULL);

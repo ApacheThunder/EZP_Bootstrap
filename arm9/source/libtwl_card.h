@@ -125,8 +125,13 @@ extern "C"
     void card_romCpuReadUnaligned(u8* dst, u32 words);
 
     void card_romCpuWrite(const u32* src, u32 words);
-    void card_romCpuWriteUnaligned(const u8* src, u32 words);
+    void card_romCpuWriteUnaligned(const u8* src, u32 words);	
+	void cardExt_ReadData(u64 command, u32 flags, void* buffer, u32 length);
+	void cardExt_WriteData(u64 command, u32 flags, const void* buffer, u32 length);
+	u32 cardExt_ReadData4Byte(u64 command, u32 flags);
+	void cardExt_SendCommand(u64 command, u32 flags);
 
 #ifdef __cplusplus
 }
 #endif
+
