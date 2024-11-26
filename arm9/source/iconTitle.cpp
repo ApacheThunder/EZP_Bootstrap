@@ -51,7 +51,8 @@ static tNDSBanner banner;
 static char EZPHardwareVersion[VERSTRING_LENGTH];
 static u32 EZPHWVerBuffer[1] = { 0xFFFFFFFF };
 
-extern tNDSBanner hbNoIcon_bin;
+extern DTCM_DATA tNDSBanner hbNoIcon_bin;
+
 
 static inline void writecharRS (int row, int col, u16 car) {
 	// get map pointer

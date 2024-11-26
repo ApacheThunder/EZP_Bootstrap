@@ -16,8 +16,8 @@ include $(DEVKITARM)/ds_rules
 # all directories are relative to this makefile
 #---------------------------------------------------------------------------------
 BUILD    := build
-SOURCES  := source
-INCLUDES := include
+SOURCES  := source include include/common include/ez5n
+INCLUDES := include include/common include/ez5n
 DATA     := ../data
 GRAPHICS := gfx
 
