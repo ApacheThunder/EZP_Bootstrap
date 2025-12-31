@@ -16,8 +16,7 @@ void gbaMode() {
 	for(vr = 0; vr < 0x1000; vr++);	// Wait ARM9
 	
 	// writePowerManagement(PM_BACKLIGHT_LEVEL, (backlightLevel & 0x03));
-	writePowerManagement(PM_BACKLIGHT_LEVEL, (PersonalData->defaultBrightness & 0x03));
-
+	
 	if (PersonalData->gbaScreen) {
 		writePowerManagement(PM_CONTROL_REG, PM_BACKLIGHT_BOTTOM | PM_SOUND_AMP);
 	} else {
@@ -64,6 +63,8 @@ int main(void) {
 		i2cWriteRegister(0x4A, 0x12, 0x00);	// Press power-button for auto-reset
 		i2cWriteRegister(0x4A, 0x70, 0x01);	// Bootflag = Warmboot/SkipHealthSafety
 	}*/
+	
+	writePowerManagement(PM_BACKLIGHT_LEVEL, (PersonalData->defaultBrightness & 0x03));
 	
 	while(1)swiWaitForVBlank();
 	return 0;

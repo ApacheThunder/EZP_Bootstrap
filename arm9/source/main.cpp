@@ -53,12 +53,12 @@ volatile bool gbaGuiEnabled = false;
 
 // const bool BlankScreenOnBoot = true;
 
-static const int pathListSize = 4;
+static const int pathListSize = 6;
 static const int framePathListSize = 5;
 static const bool EnableAutoBoot = true;
 
 // First path is expected to be from internal fat image.
-static const char *PossiblePaths[4] = { "nitro:/GBAExploader.nds", "ez5n:/boot.nds", "ez5n:/boot.dat", "ez5n:/GBAExploader.nds" };
+static const char *PossiblePaths[6] = { "nitro:/_picoboot.nds", "nitro:/boot.nds", "ez5n:/_picoboot.nds", "ez5n:/boot.nds", "ez5n:/boot.dat", "ez5n:/GBAExploader.nds" };
 
 // First path is expected to be from internal fat image.
 static const char *GBAFramePaths[5] = {
@@ -235,7 +235,7 @@ int main(int argc, char **argv) {
 			if((access("nitro:/GodMode9i.nds", F_OK) == 0))runNdsFile("nitro:/GodMode9i.nds", 0, NULL);
 		} break;
 		case KEY_X: {
-			if((access("nitro:/mmd.nds", F_OK) == 0))runNdsFile("nitro:/mmd.nds", 0, NULL);
+			if((access("nitro:/GBAExpLoader.nds", F_OK) == 0))runNdsFile("nitro:/GBAExpLoader.nds", 0, NULL);
 		} break;
 		case KEY_SELECT: autoBoot = EnableAutoBoot; break;
 		case 0: {

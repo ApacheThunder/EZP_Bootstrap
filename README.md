@@ -77,6 +77,9 @@ you must solder it back down. Then go back into EZP Recovery Tool and flash a ne
 
 Do not run official fw v1.06 or newer on the cart again in the future. Doing so will require a repeat of this process if you want to flash a new custom rom to it agian.
 
+Also if you wish to keep the ntrboot section functional be sure to preserve the copy of ntrboot image stored at 0x253400 and a copy of the first 0x200 bytes of the FIRM image also exists at 0x2400.
+
+Because EZP does not appear to store any blowfish keys in the flashrom image, they are hardcoded so only 3DS ntrboot can be used with this cart. It can't be updated to use DSi ntrboot unfortunately.
 
 # License
 Note: While the GPL license allows you to distribute modified versions of this program it would be appreciated if any improvements are contributed to devkitPro. Ultimately the community as a whole is better served by having a single official source for tools, applications and libraries.
